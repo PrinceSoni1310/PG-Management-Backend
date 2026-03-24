@@ -9,5 +9,7 @@ router.get("/users",userController.getUser)
 router.put("/user/:id",userController.updateUser)
 router.delete("/user/:id",userController.deleteUser)
 router.get("/user", validateToken,userController.getUser)
+router.post("/forgotpassword",userController.forgotPassword)
+router.put("/resetpassword",userController.resetPassword)
 
 module.exports = router
