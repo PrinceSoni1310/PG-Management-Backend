@@ -1,10 +1,16 @@
 const router = require("express").Router()
-
+const validateToken = require("../middleware/AuthMiddleware")
 const complaintController = require("../controllers/ComplaintController")
 
-router.post("/complaint",complaintController.manageComplaint)
-router.get("/complaints" , complaintController.getAllComplaints)
-router.put("/complaint/:id",complaintController.updateComplaintDetails)
-router.delete("/compalaint/:id",complaintController.deleteComplaintDetails)
+// Tenant routes
+router.post("/", validateToken, complaintController.createComplaint)
+router.get("/tenant", validateToken, complaintController.getTenantComplaints)
+
+// Owner routes
+router.get("/owner", validateToken, complaintController.getOwnerComplaints)
+router.put("/:complaintId", validateToken, complaintController.updateComplaintStatus)
+
+// Delete
+router.delete("/:complaintId", validateToken, complaintController.deleteComplaint)
 
 module.exports = router

@@ -10,11 +10,12 @@ const noticeSchema = new schema ({
     title : {
         type : String, // Subject/Headline of the notice. 
     },
-    message : {
+    content : {
         type : String //Detailed content of the announcement.
     },
-    postedDate : {
-        type : Date  //Timestamp of when the notice was published. 
+    createdAt : {
+        type : Date,
+        default: Date.now
     } 
 
 })

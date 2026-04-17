@@ -2,11 +2,6 @@ const mongoose = require ("mongoose")
 const schema = mongoose.Schema
 
 const roomSchema  = new schema ({
-
-    // roomId : {
-    //     type  : String,
-    //     required : true
-    // },
     pgId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : "PG"
@@ -22,9 +17,12 @@ const roomSchema  = new schema ({
     occupiedBeds : {
         type  : Number,
         required : true,
-        // default : ""
-    }
-
+        default: 0
+    },
+    occupants: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }]
 })
 
 module.exports = mongoose.model ("Rooms" ,roomSchema)

@@ -1,9 +1,15 @@
-const router = require("express").Router()
-const paymentController = require("../controllers/PaymentController")
+const router = require("express").Router();
+const controller = require("../controllers/PaymentController");
+const auth = require("../middleware/AuthMiddleware");
 
-router.post("/payment",paymentController.managePayment)
-router.get("/payments" ,paymentController.getPayments)
-router.put("/payment/:id",paymentController.updatePaymentDetails)
-router.delete("/payment/:id",paymentController.deletePaymentDetails)
+router.post("/order", auth, controller.createRazorpayOrder);
+router.post("/verify", auth, controller.verifyPayment);
 
-module.exports = router
+router.post("/confirm-upi", auth, controller.confirmUpiPayment);
+router.post("/cash", auth, controller.confirmCashPayment);
+
+router.get("/", auth, controller.getAllPayments);
+router.get("/my", auth, controller.getTenantPayments);
+router.get("/owner", auth, controller.getOwnerPayments);
+
+module.exports = router;

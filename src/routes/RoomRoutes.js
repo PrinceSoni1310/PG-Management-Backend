@@ -1,10 +1,10 @@
 const router = require("express").Router()
-
 const roomController = require("../controllers/RoomController")
+const validateToken = require("../middleware/AuthMiddleware")
 
-router.post("/room",roomController.manageRooms)
-router.get("/rooms",roomController.getRooms)
-router.put("room/:id",roomController.updateRooms)
-router.delete("/room/:id",roomController.deleteRooms)
+router.post("/", validateToken, roomController.manageRooms)
+router.get("/", validateToken, roomController.getRooms)
+router.put("/:id", validateToken, roomController.updateRooms)
+router.delete("/:id", validateToken, roomController.deleteRooms)
 
 module.exports = router

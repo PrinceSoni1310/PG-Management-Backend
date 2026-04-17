@@ -1,10 +1,27 @@
-const router = require("express").Router()
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/AuthMiddleware");
 
-const pgController = require("../controllers/PgController")
+const {
+  createPg,
+  getPGs,
+  updatePg,
+  deletePg,
+  approvePg,
+  rejectPg
+} = require("../controllers/PgController");
 
-router.post("/createPg",pgController.createPg)
-router.get("/pgDetails",pgController.getPgDetails)
-router.put("/pgDetail/:id",pgController.updatePg)
-router.delete("/pgDetail/:id",pgController.deletePg)
+// ================= COMMON ROUTE =================
+// 🔥 One API handles all roles (Admin, Owner, Tenant)
+router.get("/", authMiddleware, getPGs);
 
-module.exports = router
+// ================= OWNER =================
+router.post("/", authMiddleware, createPg);
+router.put("/:id", authMiddleware, updatePg);
+router.delete("/:id", authMiddleware, deletePg);
+
+// ================= ADMIN =================
+router.put("/:id/approve", authMiddleware, approvePg);
+router.put("/:id/reject", authMiddleware, rejectPg);
+
+module.exports = router;

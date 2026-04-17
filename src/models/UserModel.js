@@ -7,22 +7,43 @@ const userSchema = new schema({
         type: String,
         required: true
     },
+
     email: {
         type: String,
         required: true,
         unique: true
     },
+
+    // ✅ FIXED ROLE (LOWERCASE)
     role: {
         type: String,
-        enum: ["Admin", "Owner", "Tenant"]
+        enum: ["admin", "owner", "tenant"],
+        required: true
     },
+
     password: {
         type: String,
         required: true
     },
-    confirmPassword : {
-        type : String,
-        required : true
+
+    pgId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PG"
+    },
+
+    roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Rooms"
+    },
+
+    phone: {
+        type: String,
+        default: ''
+    },
+
+    address: {
+        type: String,
+        default: ''
     }
 
 }, {

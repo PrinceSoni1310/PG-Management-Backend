@@ -21,8 +21,9 @@ const manageNotice = async(req,res) => {
 const getAllNotice = async(req,res) => {
 
     try{
-
-        const getNotice = await noticeSchema.find()
+        const { pgId } = req.query;
+        const query = pgId ? { pgId } : {};
+        const getNotice = await noticeSchema.find(query)
         res.status(200).json({
             message : "Notice get successfully",
             data : getNotice
