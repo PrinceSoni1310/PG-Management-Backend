@@ -53,6 +53,10 @@ const paymentSchema = new schema(
     },
 
     upiId: String,
+    undoUsed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

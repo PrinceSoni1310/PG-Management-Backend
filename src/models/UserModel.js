@@ -44,6 +44,21 @@ const userSchema = new schema({
     address: {
         type: String,
         default: ''
+    },
+
+    officeAddress: {
+        type: String,
+        default: ''
+    },
+
+    collegeAddress: {
+        type: String,
+        default: ''
+    },
+
+    profilePhoto: {
+        type: String,
+        default: ''
     }
 
 }, {

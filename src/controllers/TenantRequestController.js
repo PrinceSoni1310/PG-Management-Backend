@@ -98,6 +98,9 @@ const getOwnerRequests = async (req, res) => {
     if (req.query.status) {
       filter.status = req.query.status
     }
+    if (req.query.pgId) {
+      filter.pgId = req.query.pgId
+    }
 
     const requests = await TenantRequest.find(filter)
       .populate("tenantId", "fullName email")

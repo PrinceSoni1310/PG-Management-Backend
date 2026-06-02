@@ -132,10 +132,28 @@ const confirmCashPayment = async (req, res) => {
       amount,
       month: new Date().toLocaleString("default", { month: "long" }),
       year: new Date().getFullYear(),
-      status: "success",
+      status: "pending",
       paymentMethod: "cash",
-      paymentDate: new Date(),
     });
+
+    res.status(200).json({ success: true, data: payment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const markCashPaymentPaid = async (req, res) => {
+  try {
+    const paymentId = req.params.id;
+    const payment = await Payment.findOneAndUpdate(
+      { _id: paymentId, ownerId: req.user._id, paymentMethod: 'cash', status: 'pending' },
+      { status: 'success', paymentDate: new Date() },
+      { new: true }
+    );
+
+    if (!payment) {
+      return res.status(404).json({ message: 'Payment not found or cannot be updated' });
+    }
 
     res.status(200).json({ success: true, data: payment });
   } catch (err) {
@@ -165,6 +183,32 @@ const getAllPayments = async (req, res) => {
   res.json({ data: payments });
 };
 
+// ================= MOCK PAYMENT (DEMO ONLY) =================
+const confirmMockPayment = async (req, res) => {
+  try {
+    const { amount, pgId, paymentMethod } = req.body;
+    const tenantId = req.user._id;
+
+    const pg = await PG.findById(pgId);
+
+    const payment = await Payment.create({
+      tenantId,
+      pgId,
+      ownerId: pg?.ownerId,
+      amount,
+      month: new Date().toLocaleString("default", { month: "long" }),
+      year: new Date().getFullYear(),
+      status: "success",
+      paymentMethod: paymentMethod || "card",
+      paymentDate: new Date(),
+    });
+
+    res.status(200).json({ success: true, data: payment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createRazorpayOrder,
   verifyPayment,
@@ -173,4 +217,53 @@ module.exports = {
   getTenantPayments,
   getOwnerPayments,
   getAllPayments,
+  confirmMockPayment,
+  markCashPaymentPaid,
+  // owner confirms cash payment (create paid record)
+  ownerConfirmCashPayment: async (req, res) => {
+    try {
+      const { tenantId, pgId, amount, month, year } = req.body;
+      const ownerId = req.user._id;
+
+      if (!tenantId || !pgId) return res.status(400).json({ message: 'tenantId and pgId required' });
+
+      const pg = await PG.findById(pgId);
+      if (!pg) return res.status(404).json({ message: 'PG not found' });
+      if (String(pg.ownerId) !== String(ownerId)) return res.status(403).json({ message: 'Not authorized' });
+
+      const payment = await Payment.create({
+        tenantId,
+        pgId,
+        ownerId,
+        amount,
+        month: month || new Date().toLocaleString('default', { month: 'long' }),
+        year: year || new Date().getFullYear(),
+        status: 'success',
+        paymentMethod: 'cash',
+        paymentDate: new Date(),
+      });
+
+      res.status(200).json({ success: true, data: payment });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
+  unmarkCashPayment: async (req, res) => {
+    try {
+      const paymentId = req.params.id;
+      const payment = await Payment.findOneAndUpdate(
+        { _id: paymentId, ownerId: req.user._id, paymentMethod: 'cash', status: 'success', undoUsed: { $ne: true } },
+        { status: 'pending', paymentDate: null, undoUsed: true },
+        { new: true }
+      );
+
+      if (!payment) {
+        return res.status(404).json({ message: 'Payment not found or undo not available' });
+      }
+
+      res.status(200).json({ success: true, data: payment });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  },
 };

@@ -43,6 +43,10 @@ const pgSchema = new schema ({
         type : String,
         default : ''
     },
+    scannerCode: {
+        type: String,
+        default: ''
+    },
     rentPerBed : {
         type  : Number,
         required : true
